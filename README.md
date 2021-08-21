@@ -21,5 +21,11 @@ Use the npm to install all dependencies after cloning this cartridge.
 npm install
 ```
 
+After install, it maybe get an error with node-sass. 
+
+```
+npm install node-sass
+```
+
 ## Documentation
 [B2C Document](https://documentation.b2c.commercecloud.salesforce.com/DOC1/index.jsp)
