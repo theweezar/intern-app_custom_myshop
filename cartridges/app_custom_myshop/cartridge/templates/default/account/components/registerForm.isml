@@ -2,7 +2,7 @@
     action="${pdict.createAccountUrl}"
     class="registration"
     method="POST"
-    name="${pdict.profileForm.htmlName}">
+    <isprint value="${pdict.profileForm.attributes}" encoding="off"/>>
     
     <div class="row">
         <div class="col-12 col-md-6">
@@ -113,9 +113,9 @@
                 </label>
                 <select id="registration-form-gender" class="form-control"
                 <isprint value=${pdict.profileForm.customer.gender.attributes} encoding="off" />>
-                    <option value="male">${Resource.msg('label.form.gender.nothing','forms',null)}</option>
-                    <option value="male">${Resource.msg('label.form.gender.male','forms',null)}</option>
-                    <option value="female">${Resource.msg('label.form.gender.female','forms',null)}</option>
+                    <option value="0">${Resource.msg('label.form.gender.other','forms',null)}</option>
+                    <option value="1">${Resource.msg('label.form.gender.male','forms',null)}</option>
+                    <option value="2">${Resource.msg('label.form.gender.female','forms',null)}</option>
                 </select>
                 <div class="invalid-feedback"></div>
             </div>
