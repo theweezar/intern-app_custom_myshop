@@ -5,6 +5,7 @@ var account = module.superModule;
 server.extend(account);
 
 // https://dev11-asia-samsonite.demandware.net/on/demandware.store/Sites-RefArchGlobal-Site/en_GB/Login-Show
+// https://demo-asia-samsonite.demandware.net/on/demandware.store/Sites-RefArch-Site/en_US/Login-Show
 
 server.replace(
     'SubmitRegistration',
@@ -14,8 +15,8 @@ server.replace(
         var CustomerMgr = require('dw/customer/CustomerMgr');
         var Resource = require('dw/web/Resource');
         var formErrors = require('*/cartridge/scripts/formErrors');
-        var registrationForm = server.forms.getForm('profile');
 
+        var registrationForm = server.forms.getForm('profile');
         // validate unqiue email
         var existProfile = CustomerMgr.queryProfile('email LIKE {0}', registrationForm.customer.email.value);
         if (existProfile) {
@@ -45,7 +46,6 @@ server.replace(
             registrationForm.valid = false;
         }
 
-        // setting variables for the BeforeComplete function
         var registrationFormObj = {
             firstName: registrationForm.customer.firstname.value,
             lastName: registrationForm.customer.lastname.value,
@@ -67,8 +67,6 @@ server.replace(
                 var accountHelpers = require('*/cartridge/scripts/helpers/accountHelpers');
                 var authenticatedCustomer;
                 var serverError;
-
-                // getting variables for the BeforeComplete function
                 var registrationForm = res.getViewData(); // eslint-disable-line
 
                 if (registrationForm.validForm) {
@@ -130,7 +128,6 @@ server.replace(
                 }
 
                 if (registrationForm.validForm) {
-                    // send a registration email
                     // accountHelpers.sendCreateAccountEmail(authenticatedCustomer.profile);
 
                     res.setViewData({ authenticatedCustomer: authenticatedCustomer });
@@ -156,4 +153,63 @@ server.replace(
     }
 );
 
+server.replace(
+    'Login',
+    server.middleware.https,
+    csrfProtection.validateAjaxRequest,
+    function (req, res, next) {
+        var CustomerMgr = require('dw/customer/CustomerMgr');
+        var Resource = require('dw/web/Resource');
+        var Transaction = require('dw/system/Transaction');
+        var accountHelpers = require('*/cartridge/scripts/helpers/accountHelpers');
+        var username = req.form.loginUsername;
+        var password = req.form.loginPassword;
+        var rememberMe = req.form.loginRememberMe
+            ? (!!req.form.loginRememberMe)
+            : false;
+
+        var customerLoginResult = Transaction.wrap(function () {
+            var authenticateCustomerResult = CustomerMgr.authenticateCustomer(username, password);
+            if (authenticateCustomerResult.status !== 'AUTH_OK') {
+                var errorCodes = {
+                    ERROR_CUSTOMER_DISABLED: 'error.message.account.disabled',
+                    ERROR_CUSTOMER_LOCKED: 'error.message.account.locked',
+                    ERROR_CUSTOMER_NOT_FOUND: 'error.message.login.form',
+                    ERROR_PASSWORD_EXPIRED: 'error.message.password.expired',
+                    ERROR_PASSWORD_MISMATCH: 'error.message.password.mismatch',
+                    ERROR_UNKNOWN: 'error.message.error.unknown',
+                    default: 'error.message.login.form'
+                };
+                var errorMessageKey = errorCodes[authenticateCustomerResult.status] || errorCodes.default;
+                var errorMessage = Resource.msg(errorMessageKey, 'login', null);
+                return {
+                    error: true,
+                    errorMessage: errorMessage,
+                    status: authenticateCustomerResult.status,
+                    authenticatedCustomer: null
+                };
+            }
+            return {
+                error: false,
+                errorMessage: null,
+                status: authenticateCustomerResult.status,
+                authenticatedCustomer: CustomerMgr.loginCustomer(authenticateCustomerResult, rememberMe)
+            };
+        });
+
+        if (customerLoginResult.authenticatedCustomer) {
+            res.setViewData({ authenticatedCustomer: customerLoginResult.authenticatedCustomer });
+            res.json({
+                success: true,
+                redirectUrl: accountHelpers.getLoginRedirectURL(req.querystring.rurl, req.session.privacyCache, false)
+            });
+            req.session.privacyCache.set('args', null);
+        } else {
+            res.json({ error: [Resource.msg('error.message.login.form', 'login', null)] });
+        }
+        return next();
+    }
+);
+
 module.exports = server.exports();
+

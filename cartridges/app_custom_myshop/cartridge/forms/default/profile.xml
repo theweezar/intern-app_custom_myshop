@@ -45,9 +45,7 @@
 			formid="phone"
 			label="label.input.phone.profile"
 			mandatory="true"
-			max-length="10"
 			regexp="^(0|\+84)+([0-9]{9,9})+$"
-			range-error="error.message.lessthan10"
 			missing-error="error.message.required"
 			parse-error="error.message.parse.phone.profile.form"
 			type="string"/>
@@ -57,6 +55,7 @@
 			label="label.input.gender.profile" 
 			mandatory="false"
 			type="number" />
+
 	</group>
 
 	<group formid="login">
