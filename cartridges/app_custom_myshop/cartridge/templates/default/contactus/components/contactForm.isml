@@ -1,0 +1,53 @@
+<form action="${pdict.actionUrl}" class="login" method="POST" name="contact-us-form">
+    <div class="form-group required">
+        <label class="form-control-label" for="contactus-form-firstname">
+            <isprint value="${pdict.contactUsForm.contact.firstname.label}" encoding="htmlcontent" />
+        </label>
+        <input type="text" id="contactus-form-firstname" class="form-control" 
+            name="firstname"
+            <isprint value=${pdict.contactUsForm.contact.firstname.attributes} encoding="off" />
+        />
+        <div class="invalid-feedback"></div>
+    </div>
+
+    <div class="form-group required">
+        <label class="form-control-label" for="contactus-form-lastname">
+            <isprint value="${pdict.contactUsForm.contact.lastname.label}" encoding="htmlcontent" />
+        </label>
+        <input type="text" id="contactus-form-lastname" class="form-control" 
+            name="lastname"
+            <isprint value=${pdict.contactUsForm.contact.lastname.attributes} encoding="off" />
+        />
+        <div class="invalid-feedback"></div>
+    </div>
+
+    <div class="form-group required">
+        <label class="form-control-label" for="contactus-form-email">
+            <isprint value="${pdict.contactUsForm.contact.email.label}" encoding="htmlcontent" />
+        </label>
+        <input
+            type="text"
+            class="form-control"
+            id="contactus-form-email"
+            <isprint value=${pdict.contactUsForm.contact.email.attributes} encoding="off" />
+        />
+        <div class="invalid-feedback"></div>
+    </div>
+
+    <div class="form-group required">
+        <label class="form-control-label" for="contactus-form-message">
+            <isprint value="${pdict.contactUsForm.contact.message.label}" encoding="htmlcontent" />
+        </label>
+        <textarea 
+            class="form-control" 
+            id="contactus-form-message" 
+            rows="5"
+            <isprint value=${pdict.contactUsForm.contact.message.attributes} encoding="off" />
+        ></textarea>
+        <div class="invalid-feedback"></div>
+    </div>
+
+    <input type="hidden" name="${pdict.csrf.tokenName}" value="${pdict.csrf.token}"/>
+
+    <button type="submit" class="btn btn-block btn-primary">${Resource.msg('button.text.submit', 'forms', null)}</button>
+</form>

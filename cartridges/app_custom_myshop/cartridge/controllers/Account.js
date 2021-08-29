@@ -4,7 +4,6 @@ var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 var account = module.superModule;
 server.extend(account);
 
-// https://dev11-asia-samsonite.demandware.net/on/demandware.store/Sites-RefArchGlobal-Site/en_GB/Login-Show
 // https://demo-asia-samsonite.demandware.net/on/demandware.store/Sites-RefArch-Site/en_US/Login-Show
 
 server.replace(
