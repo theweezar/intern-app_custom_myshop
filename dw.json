@@ -3,7 +3,8 @@
     "username": "duc.hoang@globee.hk",
     "password": "D_uchng@3019_",
     "cartridge": [
-        "app_custom_myshop"
+        "app_custom_myshop",
+        "plugin_google_recaptcha"
     ],
     "code-version": "duc_sfra_v1"
 }

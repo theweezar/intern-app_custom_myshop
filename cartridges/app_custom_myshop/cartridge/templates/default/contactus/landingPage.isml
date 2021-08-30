@@ -2,6 +2,7 @@
     <isscript>
         var assets = require('*/cartridge/scripts/assets.js');
         assets.addCss('/css/login.css');
+        assets.addJs('/js/contactUs.js');
     </isscript>
 
     <div class="hero slant-down login-banner">
@@ -13,10 +14,11 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="login-form-nav">
+                        <div class="mb-4 contact-us-wrapper">
                             <div class="tab-content">
                                 <div class="tab-pane active" id="register" role="tabpanel">
                                     <isinclude template="contactus/components/contactForm" />
+                                    ${dw.system.HookMgr.hasHook('google.render.script') ? 'Has' : 'not has'}
                                 </div>
                             </div>
                         </div>

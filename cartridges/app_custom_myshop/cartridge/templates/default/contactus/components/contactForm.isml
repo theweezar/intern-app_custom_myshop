@@ -1,10 +1,9 @@
-<form action="${pdict.actionUrl}" class="login" method="POST" name="contact-us-form">
+<form action="${pdict.actionUrl}" class="contact-us-form" method="POST" name="contact-us-form">
     <div class="form-group required">
         <label class="form-control-label" for="contactus-form-firstname">
             <isprint value="${pdict.contactUsForm.contact.firstname.label}" encoding="htmlcontent" />
         </label>
         <input type="text" id="contactus-form-firstname" class="form-control" 
-            name="firstname"
             <isprint value=${pdict.contactUsForm.contact.firstname.attributes} encoding="off" />
         />
         <div class="invalid-feedback"></div>
@@ -15,7 +14,6 @@
             <isprint value="${pdict.contactUsForm.contact.lastname.label}" encoding="htmlcontent" />
         </label>
         <input type="text" id="contactus-form-lastname" class="form-control" 
-            name="lastname"
             <isprint value=${pdict.contactUsForm.contact.lastname.attributes} encoding="off" />
         />
         <div class="invalid-feedback"></div>
