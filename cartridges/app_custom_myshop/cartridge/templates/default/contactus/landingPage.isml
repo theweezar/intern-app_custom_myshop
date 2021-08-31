@@ -18,7 +18,7 @@
                             <div class="tab-content">
                                 <div class="tab-pane active" id="register" role="tabpanel">
                                     <isinclude template="contactus/components/contactForm" />
-                                    ${dw.system.HookMgr.hasHook('google.render.script') ? 'Has' : 'not has'}
+                                    ${dw.system.HookMgr.callHook('google.render.script', 'renderScript', '') || ''}
                                 </div>
                             </div>
                         </div>

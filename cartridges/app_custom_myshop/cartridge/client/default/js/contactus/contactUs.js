@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use strict';
 var formValidation = require('base/components/formValidation');
 
@@ -24,6 +25,9 @@ function submitContactMessage() {
         e.preventDefault();
         var form = $(this);
         var url = form.attr('action');
+        var seperator = url.indexOf('?') !== -1 ? '&' : '?';
+        var inputToken = $('input#g-recaptcha-response');
+        url = url + seperator + 'captchaToken=' + inputToken.val();
         var contactUsWrapper = $('.contact-us-wrapper');
         form.spinner().start();
         $.ajax({
@@ -33,14 +37,23 @@ function submitContactMessage() {
             data: form.serialize()
         }).done(function (data) {
             form.spinner().stop();
-            if (!data.success) {
-                formValidation(form, data);
+            console.log(data);
+            if (data.success) {
+                contactUsWrapper.append(renderAlert('success', data.successMessage));
+            } else if (!data.success) {
                 contactUsWrapper.append(renderAlert('danger', data.errorMessage));
             } else {
-                contactUsWrapper.append(renderAlert('success', data.successMessage));
+                formValidation(form, data);
             }
-        }).fail(function () {
+        }).fail(function (error) {
             form.spinner().stop();
+            console.error(error);
+        }).always(function () {
+            // Refresh token when request is done
+            inputToken.remove();
+            if (typeof executeCaptcha === 'function') {
+                executeCaptcha();
+            }
         });
         return false;
     });

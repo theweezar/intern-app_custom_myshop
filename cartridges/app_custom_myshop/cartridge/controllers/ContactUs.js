@@ -1,11 +1,12 @@
 'use strict';
 var server = require('server');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
+var HookMgr = require('dw/system/HookMgr');
+var Resource = require('dw/web/Resource');
+var URLUtils = require('dw/web/URLUtils');
 
 server.get('Landing', csrfProtection.generateToken, function (req, res, next) {
     var contactUsForm = server.forms.getForm('contactus');
-    var URLUtils = require('dw/web/URLUtils');
-    var Resource = require('dw/web/Resource');
     contactUsForm.clear();
     var actionUrl = URLUtils.url('ContactUs-SubmitContact');
     var breadcrumbs = [
@@ -28,7 +29,22 @@ server.post('SubmitContact',
     function (req, res, next) {
         var contactUsForm = server.forms.getForm('contactus');
         var formErrors = require('*/cartridge/scripts/formErrors');
-        var Resource = require('dw/web/Resource');
+        var querystring = req.querystring;
+
+        if (HookMgr.hasHook('google.verify.captcha')) {
+            var captchaToken = querystring.captchaToken;
+            var isValid = HookMgr.callHook('google.verify.captcha', 'verifyCaptcha', captchaToken);
+
+            if (!isValid || !isValid.success) {
+                res.json({
+                    error: true,
+                    errorMessage: Resource.msg('error.message.google.captcha.invalid', 'footer', null)
+                });
+
+                return next();
+            }
+        }
+
         var contactObject = {
             firstName: contactUsForm.contact.firstname.value,
             lastName: contactUsForm.contact.lastname.value,
@@ -36,46 +52,44 @@ server.post('SubmitContact',
             message: contactUsForm.contact.message.value,
             validForm: contactUsForm.valid
         };
+
         if (contactUsForm.valid) {
-            res.setViewData(contactObject);
             // eslint-disable-next-line no-shadow
-            this.on('route:BeforeComplete', function (req, res) {
-                var viewData = res.getViewData();
-                var serverError = true;
-                var CustomObjectMgr = require('dw/object/CustomObjectMgr');
-                var Transaction = require('dw/system/Transaction');
-                var hashHelpers = require('*/cartridge/scripts/hashHelpers');
+            var serverError = true;
+            var CustomObjectMgr = require('dw/object/CustomObjectMgr');
+            var Transaction = require('dw/system/Transaction');
+            var hashHelpers = require('*/cartridge/scripts/hashHelpers');
 
-                Transaction.wrap(function () {
-                    var hashKey = hashHelpers.hashMD5(viewData.email + Date.now());
-                    var contactMessage = CustomObjectMgr.createCustomObject('ContactMessage', hashKey);
-                    contactMessage.custom.firstName = viewData.firstName;
-                    contactMessage.custom.lastName = viewData.lastName;
-                    contactMessage.custom.email = viewData.email;
-                    contactMessage.custom.message = viewData.message;
-                    serverError = false;
-                });
+            Transaction.wrap(function () {
+                var hashKey = hashHelpers.hashMD5(contactObject.email + Date.now());
+                var contactMessage = CustomObjectMgr.createCustomObject('ContactMessage', hashKey);
+                contactMessage.custom.firstName = contactObject.firstName;
+                contactMessage.custom.lastName = contactObject.lastName;
+                contactMessage.custom.email = contactObject.email;
+                contactMessage.custom.message = contactObject.message;
+                serverError = false;
+            });
 
-                if (serverError) {
-                    res.setStatusCode(500);
-                    res.json({
-                        success: false,
-                        errorMessage: Resource.msg('error.message.unable.to.create.contact.message', 'footer', null)
-                    });
-                    return next();
-                }
-
+            if (serverError) {
+                res.setStatusCode(500);
                 res.json({
-                    success: true,
-                    successMessage: Resource.msg('success.message.create.contact.message', 'footer', null)
+                    success: false,
+                    errorMessage: Resource.msg('error.message.unable.to.create.contact.message', 'footer', null)
                 });
-                return next();
-            });
-        } else {
+                next();
+            }
+
             res.json({
-                fields: formErrors.getFormErrors(contactUsForm)
+                success: true,
+                successMessage: Resource.msg('success.message.create.contact.message', 'footer', null)
             });
+            return next();
         }
+
+        res.json({
+            fields: formErrors.getFormErrors(contactUsForm)
+        });
+
         return next();
     }
 );
