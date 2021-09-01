@@ -40,6 +40,8 @@ function submitContactMessage() {
             console.log(data);
             if (data.success) {
                 contactUsWrapper.append(renderAlert('success', data.successMessage));
+                form.find('input').val('');
+                form.find('textarea').val('');
             } else if (!data.success) {
                 contactUsWrapper.append(renderAlert('danger', data.errorMessage));
             } else {

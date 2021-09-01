@@ -4,6 +4,8 @@ var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 var HookMgr = require('dw/system/HookMgr');
 var Resource = require('dw/web/Resource');
 var URLUtils = require('dw/web/URLUtils');
+var CustomObjectMgr = require('dw/object/CustomObjectMgr');
+var Transaction = require('dw/system/Transaction');
 
 server.get('Landing', csrfProtection.generateToken, function (req, res, next) {
     var contactUsForm = server.forms.getForm('contactus');
@@ -56,10 +58,7 @@ server.post('SubmitContact',
         if (contactUsForm.valid) {
             // eslint-disable-next-line no-shadow
             var serverError = true;
-            var CustomObjectMgr = require('dw/object/CustomObjectMgr');
-            var Transaction = require('dw/system/Transaction');
             var hashHelpers = require('*/cartridge/scripts/hashHelpers');
-
             Transaction.wrap(function () {
                 var hashKey = hashHelpers.hashMD5(contactObject.email + Date.now());
                 var contactMessage = CustomObjectMgr.createCustomObject('ContactMessage', hashKey);
