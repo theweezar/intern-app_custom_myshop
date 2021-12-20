@@ -9,17 +9,17 @@
         <dl>
             <dt>${Resource.msg('label.profile.firstname','account',null)}</dt>
             <dd>${pdict.account.profile.firstName}</dd>
-            <dd>
+            <iscomment> <dd>
                 <isprint value="${pdict.account.profile.firstName}" encoding="off" />
-            </dd>
+            </dd> </iscomment>
         </dl>
         <dl>
             <dt>${Resource.msg('label.profile.lastname','account',null)}</dt>
             <dd>${pdict.account.profile.lastName}</dd>
             <dd>
-                <script>
+                <iscomment> <script>
                     <isprint value="${pdict.account.profile.lastName}" encoding="off" />
-                </script>
+                </script> </iscomment>
             </dd>
         </dl>
         <dl>
